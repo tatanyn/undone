@@ -1,0 +1,31 @@
+Undone
+
+Concept
+"So... you accedenlty distroyed the world.  You were stealing power orbs from Evil Corp  . What you didnt realize is those orbs also kept the earths core stable and... Kaboom"
+"The good news you have a time crystal and one shot to reverse what you've done"
+"As time moves backwards so do you. You must undo everything you did at exactly the moment you did it or risk creating a temporal anomaly."
+"Good luck"
+
+Basis Mechanics
+Character  runs in reverse.
+Cannot go foward...
+Jumping negats the natural physics (momentary pause)
+(The longer the jump the faster you will move after like you got a running start.)
+
+Start the level with items you need to put back. Dotted lines where they were.
+Everything must be  returned or you fail.-Temporal anomaly %chance+counter each missed.
+Failure to replace orb 100% fail if orb reaches end of screen
+25% fail contact enemy
+
+Items
+Phase shifter (contact badies ok can pass through bottom of platforms)
+Jetpack (can fly)
+Anti gravity boots (can double jump)
+
+
+5 floors  5-1all items return 1 item per floor fiest floor extra bassies.
+
+Graphics ideas
+make the right fade away?
+movement lines?
+5 framse sprite to make movement look revered

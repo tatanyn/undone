@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Undone</title>
+    <script src="scripts/phaser.min.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+    let  config = {
+          type: Phaser.AUTO,
+          width: 900,
+          height: 400,
+          physics: {
+              default: 'arcade',
+              arcade: {
+                  gravity: { y: 10000 },
+                  debug: true
+              }
+          },
+          scene: {
+              preload: preload,
+              create: create,
+              update: update
+
+          }
+      };
+      let game = new Phaser.Game(config);
+      let cursor
+      function preload ()
+      {
+        this.load.image('ground', 'assets/platform.png');
+          this.load.image('orb', 'assets/star.png');
+          this.load.spritesheet("dude", "assets/dude.png",
+          {
+            frameWidth: 32,
+            frameHeight: 48,
+
+          });
+
+        }
+      function create(){
+          this.add.text(20, 20, "Playing game", {font: "25px Arial", fill: "yellow"});
+          dude = this.physics.add.sprite(800,300, "dude",1);
+          this.anims.create({
+              key: 'run',
+              frames: this.anims.generateFrameNumbers('dude', { start: 3, end: 0 }),
+              frameRate: 10,
+              repeat: -1
+          });
+
+          //dude.setCollideWorldBounds(true);
+
+          this.cameras.main.startFollow(dude, true, 1, .1,300,100);
+          this.cameras.main.setZoom(1);
+
+          //
+          ground = this.physics.add.staticGroup({
+              key: 'ground',
+              repeat: 150,
+              setXY: { x: -40000, y: 378, stepX: 410 }
+          });
+
+
+//This will be power orbs
+          let orbs = this.physics.add.staticGroup();
+          orbs.create(600, 350, 'orb');
+          orbs.create(50, 250, 'orb');
+          orbs.create(750, 220, 'orb');
+          orbs.create(-50, 220, 'orb');
+          orbs.create(-250, 250, 'orb');
+          orbs.create(-600, 350, 'orb');
+          orbs.create(-550, 250, 'orb');
+          orbs.create(-750, 220, 'orb');
+          orbs.create(-5000, 220, 'orb');
+          orbs.create(-2500, 250, 'orb');
+          orbs.create(-6000, 350, 'orb');
+          orbs.create(-5500, 250, 'orb');
+          orbs.create(7500, 220, 'orb');
+          orbs.create(-15000, 220, 'orb');
+          orbs.create(-12500, 250, 'orb');
+
+
+          this.physics.add.collider(dude, ground);
+
+          cursor = this.input.keyboard.createCursorKeys();
+          //
+
+        }
+
+        function update ()
+        {
+          dude.setVelocityX(-400).setVelocityY(0);
+          dude.anims.play('run', true);
+          if (cursor.up.isDown)
+          {
+              dude.setVelocityY(-330);
+          }
+}
+
+    </script>
+  </body>
+</html>
