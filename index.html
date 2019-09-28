@@ -26,7 +26,7 @@
           }
       };
       let game = new Phaser.Game(config);
-      let cursor
+      let cursor = null;
       function preload ()
       {
         this.load.image('ground', 'assets/platform.png');
@@ -50,9 +50,8 @@
           });
 
           //dude.setCollideWorldBounds(true);
-
-          this.cameras.main.startFollow(dude, true, 1, .1,300,100);
           this.cameras.main.setZoom(1);
+
 
           //
           ground = this.physics.add.staticGroup({
@@ -84,18 +83,26 @@
           this.physics.add.collider(dude, ground);
 
           cursor = this.input.keyboard.createCursorKeys();
-          //
 
         }
 
         function update ()
         {
-          dude.setVelocityX(-400).setVelocityY(0);
+          // We always run toward negative x!
+          dude.setVelocityX(-400);
           dude.anims.play('run', true);
           if (cursor.up.isDown)
           {
-              dude.setVelocityY(-330);
+              // jumping gives us instant -y velo
+              dude.setVelocityY(-1000);
           }
+
+          // Always follow dude's x coordinate
+          this.cameras.main.scrollX = dude.x-800;
+          // Stay at ground level unless dude is within 50px
+          // of the top, then follow him.
+          this.cameras.main.scrollY = Math.min(0, dude.y-50);
+
 }
 
     </script>
