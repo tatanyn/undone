@@ -7,16 +7,20 @@
   </head>
   <body>
     <script type="text/javascript">
-    let gamePaused = false;
+    var gamePaused = false;
+    var nextLevel = false;
+    var floor = 5;
+    var endOfLevel = -3000;
+    var cursor, dude, door, level, doorText, switchText;
 
-    let  config = {
+    var  config = {
           type: Phaser.AUTO,
           width: 900,
           height: 400,
           physics: {
               default: 'arcade',
               arcade: {
-                  gravity: { y: 10000 },
+                  gravity: { y: 5000 },
                   debug: true
               }
           },
@@ -27,9 +31,8 @@
 
           }
       };
-      let game = new Phaser.Game(config);
+      var game = new Phaser.Game(config);
       // globals for game objects we need to use outside of create
-      let cursor = null, dude = null, door = null;
       function preload ()
       {
         this.load.image('ground', 'assets/platform.png');
@@ -45,7 +48,10 @@
 
         }
       function create(){
-          this.add.text(400, 20, "Floor 5", {font: "25px Arial", fill: "yellow"});
+        doorText =  this.add.text(endOfLevel-300, 40, "", {font: "45px Arial", fill: "yellow"});
+        switchTest =  this.add.text(-1500, 40, "", {font: "45px Arial", fill: "yellow"});
+
+        level =  this.add.text(400, 40, "Floor " + floor, {font: "45px Arial", fill: "yellow"});
           dude = this.physics.add.sprite(800,300, "dude",1);
           // Make sure dude shows up on top of background stuff
           dude.setDepth(10);
@@ -68,7 +74,7 @@
           });
 
           // Door position defines the end of the level
-          door = this.add.sprite(-3000, 310, "door");
+          door = this.add.sprite(endOfLevel, 310, "door");
 
           // This is just a sign marking the exit :)
           let exit = this.add.sprite(door.x+100, door.y, "exit");
@@ -111,25 +117,76 @@
 
         function update ()
         {
-          // We got to the door. For now, pause.
+          // We always run toward negative x!
+          dude.setVelocityX(-400);
+          //shows run animation
+          dude.anims.play('run', true);
+          //TO DO: CREATE A SWITCH STATMENT CONTROLING EACH FLOOR.
+          switch(floor) {
+            case 5:
+            switchTest.setText("this is 5 this is 5")
+            // code block
+            break;
+            case 4:
+            switchTest.setText("this is 4 this is 4")
+            // code block
+            break;
+            case 3:
+            switchTest.setText("this is 3 this is 3")
+            // code block
+            break;
+            case 2:
+            // code block
+            switchTest.setText("this is 1 this is 1")
+
+            break;
+            case 1:
+            // code block
+            switchTest.setText("this is 1 this is 1")
+            break;
+            default:
+            switchTest.setText("this is default - if you're seeing this you fucked up - this is default")
+
+            // code block
+}
+
+          // We got to the door.  if dude is above the door wait for dude to fall down.  For now, pause.
           // TODO: transition to next floor.
-          if ( dude.x+5 < door.x ) gamePaused = true;
-          // TODO: if dude is above the door wait for dude to fall down
+          if ( dude.x+5 < door.x) dude.setVelocityX(0);
+          if ( dude.x+5 < door.x && dude.y > door.y && floor == 1 ) {
+            doorText.setText('You win');
+            gamePaused = true;
+
+          }
+          else if ( dude.x+5 < door.x && dude.y > door.y) {
+            gamePaused = true;
+            nextLevel = true;
+            doorText.setText('Press down arrow to start next level')
+}
+
 
           // Check if we are paused
           if ( gamePaused ) {
             dude.anims.play('run', false);
             this.physics.pause();
-            return;
           }
+          else{
           this.physics.resume();
-          // We always run toward negative x!
-          dude.setVelocityX(-400);
-          dude.anims.play('run', true);
+}
+          if (cursor.down.isDown && nextLevel && gamePaused ){
+            gamePaused = false;
+            nextLevel = false;
+            dude.x= 800;
+            dude.y =300;
+            floor --;
+            level.setText('Floor ' + floor);
+            doorText.setText('')
+          }
+
           if (cursor.up.isDown)
           {
               // jumping gives us instant -y velo
-              dude.setVelocityY(-1000);
+              dude.setVelocityY(-500);
           }
 
           // Always follow dude's x until we reach door.
