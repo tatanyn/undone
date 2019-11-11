@@ -7,11 +7,6 @@
   </head>
   <body>
     <script type="text/javascript">
-    var gamePaused = false;
-    var nextLevel = false;
-    var floor = 5;
-    var endOfLevel = -3000;
-    var cursor, dude, door, level, doorText, switchText;
 
     var  config = {
           type: Phaser.AUTO,
@@ -20,7 +15,7 @@
           physics: {
               default: 'arcade',
               arcade: {
-                  gravity: { y: 5000 },
+                  gravity: { y: 1300 },
                   debug: true
               }
           },
@@ -33,6 +28,17 @@
       };
       var game = new Phaser.Game(config);
       // globals for game objects we need to use outside of create
+      var gamePaused = false;
+      var nextLevel = false;
+      var floor = 5;
+      var endOfLevel = -3000;
+      var gameOver = false;
+      var orbCount = 35;
+      var dude;
+      var orbs;
+      var cursor, door, level, doorText, switchText, orbText;
+
+
       function preload ()
       {
         this.load.image('ground', 'assets/platform.png');
@@ -49,6 +55,7 @@
         }
       function create(){
         doorText =  this.add.text(endOfLevel-300, 40, "", {font: "45px Arial", fill: "yellow"});
+        orbText =  this.add.text(750, 10, orbCount , {font: "25px Arial", fill: "white"}).setScrollFactor(0);
         switchTest =  this.add.text(-1500, 40, "", {font: "45px Arial", fill: "yellow"});
 
         level =  this.add.text(400, 40, "Floor " + floor, {font: "45px Arial", fill: "yellow"});
@@ -66,7 +73,6 @@
           this.cameras.main.setZoom(1);
 
 
-          //
           ground = this.physics.add.staticGroup({
               key: 'ground',
               repeat: 10,
@@ -80,26 +86,33 @@
           let exit = this.add.sprite(door.x+100, door.y, "exit");
           exit.scale = 0.05;
 
-//This will be power orbs
-          let orbs = this.physics.add.staticGroup();
-          orbs.create(600, 350, 'orb');
-          orbs.create(50, 250, 'orb');
+          //This will be power orbs
+          orbs = this.physics.add.group();
+          orbs.create(-1500, 350, 'orb');
+          orbs.create(500, 250, 'orb');
           orbs.create(750, 220, 'orb');
           orbs.create(-50, 220, 'orb');
           orbs.create(-250, 250, 'orb');
           orbs.create(-600, 350, 'orb');
           orbs.create(-550, 250, 'orb');
           orbs.create(-750, 220, 'orb');
-          orbs.create(-5000, 220, 'orb');
+          orbs.create(-1250, 220, 'orb');
           orbs.create(-2500, 250, 'orb');
           orbs.create(-6000, 350, 'orb');
           orbs.create(-5500, 250, 'orb');
           orbs.create(7500, 220, 'orb');
           orbs.create(-15000, 220, 'orb');
           orbs.create(-12500, 250, 'orb');
+          Phaser.Actions.SetTint(orbs.getChildren(), 0x0000ff);
 
+          // so orbs dont fall
+          Phaser.Actions.Call(orbs.getChildren(), function (orbs) {
+            orbs.body.allowGravity = false;
+          });
 
           this.physics.add.collider(dude, ground);
+
+          this.physics.add.overlap(dude, orbs, getOrbs, null, this);
 
           // Controls
           cursor = this.input.keyboard.createCursorKeys();
@@ -111,8 +124,6 @@
             else
               gamePaused = true;
           })
-
-
         }
 
         function update ()
@@ -120,29 +131,65 @@
           // We always run toward negative x!
           dude.setVelocityX(-400);
           //shows run animation
-          dude.anims.play('run', true);
+           dude.anims.play('run', true);
+          // orbText.setVelocityX(-400);
           //TO DO: CREATE A SWITCH STATMENT CONTROLING EACH FLOOR.
           switch(floor) {
             case 5:
             switchTest.setText("this is 5 this is 5")
-            // code block
+            // OBJECT: PHASING LEVEL - dude can pass through walls has High y velocity and can double jump
+            // DIFFICUTLY: EASY - their should be many paths to complettion
+            if (cursor.up.isDown)
+            {
+                // jumping gives us instant -y velo
+                dude.setVelocityY(-500);
+            }
+
             break;
             case 4:
             switchTest.setText("this is 4 this is 4")
-            // code block
+            // OBJECT: JETPACK LEVEL - dude can NOT pass through walls has high y velocity can and can double Jump
+            // DIFFICUTLY: MEDUIM - their should be a few paths to complettion but at least on bottleneck at the end where exicution should be perfect
+            if (cursor.up.isDown)
+            {
+                // jumping gives us instant -y velo
+                dude.setVelocityY(-500);
+            }
+
             break;
             case 3:
             switchTest.setText("this is 3 this is 3")
-            // code block
-            break;
-            case 2:
-            // code block
-            switchTest.setText("this is 1 this is 1")
+            // OBJECT: ANTI GRAV BOOTS LEVEL - lower y velocity and can only jump  and double jump
+            // DIFFICUTLY: Hard - their should be a few paths to completion
+            if (cursor.up.isDown && dude.body.touching.down)
+            {
+                // jumping gives us instant -y velo
+                dude.setVelocityY(-500);
+            }
 
             break;
-            case 1:
+            case 2:
+            // OBJECT: ANTI GRAV BOOTS LEVEL - lower y velocity and can only jump  and double jump
+            // DIFFICUTLY: Hard - only one path to completion with a margin of error
             // code block
+            switchTest.setText("this is 2 this is 2")
+            if (cursor.up.isDown && dude.body.touching.down)
+            {
+                // jumping gives us instant -y velo
+                dude.setVelocityY(-500);
+            }
+            break;
+            case 1:
+            // OBJECT: ANTI GRAV BOOTS LEVEL - lower y velocity and can only jump  and double jump
+            // DIFFICUTLY: PERFECT PLAY REQUIRED - their should be only one path to completion with exact timeing
+            // code block
+
             switchTest.setText("this is 1 this is 1")
+            if (cursor.up.isDown && dude.body.touching.down)
+            {
+                // jumping gives us instant -y velo
+                dude.setVelocityY(-500);
+            }
             break;
             default:
             switchTest.setText("this is default - if you're seeing this you fucked up - this is default")
@@ -150,20 +197,17 @@
             // code block
 }
 
-          // We got to the door.  if dude is above the door wait for dude to fall down.  For now, pause.
-          // TODO: transition to next floor.
+          // We got to the door.  if dude is above the door wait for dude to fall down. transition to next floor.
           if ( dude.x+5 < door.x) dude.setVelocityX(0);
           if ( dude.x+5 < door.x && dude.y > door.y && floor == 1 ) {
             doorText.setText('You win');
             gamePaused = true;
-
           }
           else if ( dude.x+5 < door.x && dude.y > door.y) {
             gamePaused = true;
             nextLevel = true;
             doorText.setText('Press down arrow to start next level')
 }
-
 
           // Check if we are paused
           if ( gamePaused ) {
@@ -180,13 +224,9 @@
             dude.y =300;
             floor --;
             level.setText('Floor ' + floor);
-            doorText.setText('')
-          }
-
-          if (cursor.up.isDown)
-          {
-              // jumping gives us instant -y velo
-              dude.setVelocityY(-500);
+            doorText.setText('');
+//            orbs.children.iterate(function() { clearTint()});
+            resetOrbs();
           }
 
           // Always follow dude's x until we reach door.
@@ -196,7 +236,26 @@
           this.cameras.main.scrollY = Math.min(0, dude.y-50);
 
 }
+function getOrbs (dude, orbs)
+{
+    orbs.clearTint();
+    orbs.disableBody(true, false);
+    orbCount --;
+    orbText.setText(orbCount);
+    console.log('got it!');
+}
 
+//this does not work becuasd when the function is called and indivudal 'orb' is not identifid. possiable fix itterate through all the the children orbs.
+function resetOrbs (dude, orbs)//dude, door
+{
+  // orb.clearTint();
+  // orb.disableBody(false, false);
+//clearTint();
+// for (i = 0; i < 15; i++) {
+//   orbs[i].cleartint();
+//}
+  console.log('resetOrbs');
+}
     </script>
   </body>
 </html>
