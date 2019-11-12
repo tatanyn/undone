@@ -192,23 +192,24 @@
             }
             break;
             default:
-            switchTest.setText("this is default - if you're seeing this you fucked up - this is default")
+            switchTest.setText("this is default - - this is default")
 
             // code block
 }
 
-          // We got to the door.  if dude is above the door wait for dude to fall down. transition to next floor.
+          // We got to the door.  if dude is above the door wait for dude to fall down.
           if ( dude.x+5 < door.x) dude.setVelocityX(0);
+          //check for win condition
           if ( dude.x+5 < door.x && dude.y > door.y && floor == 1 ) {
             doorText.setText('You win');
             gamePaused = true;
           }
+          //didn't win - move dude to next floor
           else if ( dude.x+5 < door.x && dude.y > door.y) {
             gamePaused = true;
             nextLevel = true;
             doorText.setText('Press down arrow to start next level')
 }
-
           // Check if we are paused
           if ( gamePaused ) {
             dude.anims.play('run', false);
@@ -225,8 +226,12 @@
             floor --;
             level.setText('Floor ' + floor);
             doorText.setText('');
-//            orbs.children.iterate(function() { clearTint()});
-            resetOrbs();
+            Phaser.Actions.SetTint(orbs.getChildren(), 0x0000ff);
+            //itterate through orbs reset orbs
+            orbs.children.each(function(bullet){
+              bullet.enableBody();
+            },this)
+            console.log('reset orbs');
           }
 
           // Always follow dude's x until we reach door.
@@ -234,7 +239,6 @@
           // Stay at ground level unless dude is within 50px
           // of the top, then follow him.
           this.cameras.main.scrollY = Math.min(0, dude.y-50);
-
 }
 function getOrbs (dude, orbs)
 {
@@ -245,17 +249,6 @@ function getOrbs (dude, orbs)
     console.log('got it!');
 }
 
-//this does not work becuasd when the function is called and indivudal 'orb' is not identifid. possiable fix itterate through all the the children orbs.
-function resetOrbs (dude, orbs)//dude, door
-{
-  // orb.clearTint();
-  // orb.disableBody(false, false);
-//clearTint();
-// for (i = 0; i < 15; i++) {
-//   orbs[i].cleartint();
-//}
-  console.log('resetOrbs');
-}
     </script>
   </body>
 </html>
