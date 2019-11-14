@@ -34,6 +34,7 @@
       var endOfLevel = -3000;
       var gameOver = false;
       var orbCount = 35;
+      var jumpCount =2;
       var dude;
       var orbs;
       var cursor, door, level, doorText, switchText, orbText;
@@ -133,7 +134,6 @@
           //shows run animation
            dude.anims.play('run', true);
           // orbText.setVelocityX(-400);
-          //TO DO: CREATE A SWITCH STATMENT CONTROLING EACH FLOOR.
           switch(floor) {
             case 5:
             switchTest.setText("this is 5 this is 5")
@@ -153,6 +153,12 @@
             if (cursor.up.isDown)
             {
                 // jumping gives us instant -y velo
+                dude.setVelocityY(-200);
+            }
+            if (Phaser.Input.Keyboard.JustDown(cursor.up))
+            {
+                // jumping gives us instant -y velo
+                console.log('jumped');
                 dude.setVelocityY(-500);
             }
 
@@ -161,7 +167,7 @@
             switchTest.setText("this is 3 this is 3")
             // OBJECT: ANTI GRAV BOOTS LEVEL - lower y velocity and can only jump  and double jump
             // DIFFICUTLY: Hard - their should be a few paths to completion
-            if (cursor.up.isDown && dude.body.touching.down)
+            if (Phaser.Input.Keyboard.JustDown(cursor.up) ) //&& dude.body.touching.down)
             {
                 // jumping gives us instant -y velo
                 dude.setVelocityY(-500);
@@ -240,6 +246,7 @@
           // of the top, then follow him.
           this.cameras.main.scrollY = Math.min(0, dude.y-50);
 }
+
 function getOrbs (dude, orbs)
 {
     orbs.clearTint();
