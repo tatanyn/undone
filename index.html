@@ -31,14 +31,15 @@
       let nextLevel = false;
       let floor = 5;
       let endOfLevel = -3000;
+      let startOfLevel = 800;
       let gameOver = false;
       let orbCount = 35;
       let jumpCount =2;
       let dude;
       let orbs;
       let platforms;
-      let cursor, door, level, doorText, switchText, orbText;
-
+      let cursor, door, level, doorText, switchText, orbText, elevator, ding, entrance, elevatorDown;
+      let sprite;
 
       function preload() {
         this.load.image('platform', 'assets/platform.png');
@@ -49,17 +50,24 @@
             frameWidth: 32,
             frameHeight: 48,
           });
-
+        this.load.audio('elevator', 'assets/elevator.mp3');
+        this.load.audio('ding', 'assets/dink.mp3');
       }
 
       function create() {
+        // ADD ALL TEXT
         doorText =  this.add.text(endOfLevel-350, 40, "", {font: "45px Arial", fill: "yellow"});
         orbText =  this.add.text(750, 10, orbCount , {font: "25px Arial", fill: "white"}).setScrollFactor(0);
         switchTest =  this.add.text(-1500, 40, "", {font: "45px Arial", fill: "yellow"});
 
+        // ADD ALL SOUNDS
+        this.ding = this.sound.add('ding');
+        elevator = this.sound.add('elevator');
+
         level =  this.add.text(400, 40, "Floor " + floor, {font: "45px Arial", fill: "yellow"});
 
-        dude = this.physics.add.sprite(800, 350, "dude",1);
+        dude = this.physics.add.sprite(startOfLevel, 364, "dude",1);
+
         // Make sure dude shows up on top of backplatform stuff
         dude.setDepth(10);
         this.anims.create({
@@ -79,9 +87,13 @@
             setXY: { x: 1000, y: 400, stepX: -400 }
         });
 
-        // Door position defines the end of the level
-        door = this.add.sprite(endOfLevel, 335, "door");
 
+      highPlatforms = this.physics.add.staticGroup();
+       highPlatforms.create(50,50, 'platform')
+
+        // Door positions define start and en end of the level
+        door = this.add.sprite(endOfLevel, 335, "door");
+        entrance = this.add.sprite(startOfLevel, 335, "door");
         // This is just a sign marking the exit :)
         let exit = this.add.sprite(door.x+100, door.y, "exit");
         exit.scale = 0.05;
@@ -105,9 +117,15 @@
         orbs.create(-12500, 250, 'orb');
         Phaser.Actions.SetTint(orbs.getChildren(), 0x0000ff);
 
-        this.physics.add.collider(dude, platforms);
+
+        this.physics.add.collider(dude, platforms,);
+        this.physics.add.collider(dude, highPlatforms);
         this.physics.add.overlap(dude, orbs, getOrb, null, this);
 
+
+
+        elevatorDown = this.time.addEvent({ delay: 2000, callback: onEvent, callbackScope: this,  repeat: 5 });
+        elevatorDown.paused =true;
         // Controls
         cursor = this.input.keyboard.createCursorKeys();
         pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
@@ -127,10 +145,10 @@
           this.physics.pause();
 
           if ( cursor.down.isDown && nextLevel ) {
-            gamePaused = false;
+            //gamePaused = false;
             nextLevel = false;
-            dude.x = 800;
-            dude.y = 300;
+            dude.x = startOfLevel;
+            dude.y = 364;
             floor--;
             level.setText('Floor ' + floor);
             doorText.setText('');
@@ -139,10 +157,13 @@
             orbs.children.each(function(bullet){
               bullet.enableBody();
             },this)
+            elevator.play();
             console.log('reset orbs');
+            elevatorDown.paused =false;
           }
 
         } else {
+          gamePaused = false;
           dude.setVelocityX(-400);
           this.physics.resume();
 
@@ -253,6 +274,14 @@
           orbCount --;
           orbText.setText(orbCount);
           console.log('got it!');
+          this.ding.play();
+      }
+
+      //function to create pause between levels and allow elevator sound to run.
+      function onEvent(){
+        gamePaused=false;
+        console.log('timer run');
+        elevatorDown.paused =true;
       }
 
     </script>
